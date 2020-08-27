@@ -1,0 +1,237 @@
+  -- Find any traces of empty stations?
+  -- How big is this problem?
+  
+/*
+
+778 Distinct bike stations
+11 bike stations that are completely empty (0 available bikes)
+
+However, how many bike racks are out of their capacity?
+
+*/
+
+-- Query to check the number of empty stations, at-capacity stations, out-of-capacity stations, and total distinct bike Stations
+
+SELECT
+  (
+  SELECT
+    COUNT(id)
+  FROM
+    `bigquery-public-data.london_bicycles.cycle_stations`
+  WHERE
+    bikes_count = 0 AND removal_date is null) AS empty,
+    (
+  SELECT
+    COUNT(id)
+  FROM
+    `bigquery-public-data.london_bicycles.cycle_stations`
+  WHERE
+    bikes_count != 0 AND removal_date is null) AS at_capacity,
+    (
+  SELECT
+    COUNT(id)
+  FROM
+    `bigquery-public-data.london_bicycles.cycle_stations`
+  WHERE
+   removal_date is not null) AS out_of_service,
+  COUNT(id) AS total_station
+FROM
+  `bigquery-public-data.london_bicycles.cycle_stations` as station
+LIMIT
+  1000;
+
+-- Query to see empty station details
+
+SELECT
+  id,
+  name,
+  bikes_count,
+  nbEmptyDocks,
+  docks_count, 
+FROM
+  `bigquery-public-data.london_bicycles.cycle_stations`
+WHERE nbEmptyDocks = docks_count
+LIMIT
+  1000;
+
+-- What are the most popular stations in the network?
+-- When does their usage peak?
+
+/*
+
+The most popular start stations are Belgrove Street at King’s Cross and Waterloo Station 3 
+at Waterloo, with trips duration between 12-14 minutes, occurring between 7-9 am on Monday 
+to Saturday.
+This signals the high demand for bikes for commuting at rush hours. 
+
+*/
+
+SELECT
+  COUNT(rental_id) AS trips,
+  start_station_name,
+  ROUND(AVG(duration)/60,1) as avg_minutes,
+  EXTRACT(DAYOFWEEK
+  FROM
+    start_date) AS the_day,
+  EXTRACT(HOUR
+  FROM
+    start_date) AS the_hour
+FROM
+  `bigquery-public-data.london_bicycles.cycle_hire` AS hire
+GROUP BY
+  start_station_name,
+  the_day,
+  the_hour
+ORDER BY
+  trips DESC
+LIMIT
+  1000;
+
+/*
+
+--PEAK USAGE OF MOST POPULAR STATIONS 
+
+SELECT
+  COUNT(rental_id) AS trips,
+  start_station_name,
+  ROUND(AVG(duration)/60,1) as avg_minutes,
+  EXTRACT(DAYOFWEEK
+  FROM
+    start_date) AS the_day,
+  EXTRACT(HOUR
+  FROM
+    start_date) AS the_hour
+FROM
+  `bigquery-public-data.london_bicycles.cycle_hire` AS hire
+GROUP BY
+  start_station_name,
+  the_day,
+  the_hour
+ORDER BY
+  trips DESC
+LIMIT
+  1000;
+
+--How to categorize popular trips by different characteristics?
+SELECT
+  COUNT(rental_id) AS trips,
+  start_station_name,
+  end_station_name,
+  ROUND(AVG(duration)/60,1) AS avg_minutes,
+  CASE
+    WHEN ROUND(AVG(duration)/60,1) >= 30 THEN "workout"
+    WHEN ROUND(AVG(duration)/60,1) >= 7 THEN "commute"
+    WHEN ROUND(AVG(duration)/60,1) <7 THEN "quick ride"
+END
+  AS trip_type/*,
+  EXTRACT(DAYOFWEEK
+  FROM
+    start_date) AS the_day,
+  EXTRACT(HOUR
+  FROM
+    start_date) AS the_hour*/
+FROM
+  `bigquery-public-data.london_bicycles.cycle_hire` AS hire
+GROUP BY
+  start_station_name,
+  end_station_name/*,
+  the_day,
+  the_hour */
+ORDER BY
+  trips DESC
+LIMIT
+  1000;
+
+--Popular trips by peak days and hours
+SELECT
+  COUNT(rental_id) AS trips,
+  start_station_name,
+  end_station_name,
+  ROUND(AVG(duration)/60,1) as avg_minutes,
+  EXTRACT(DAYOFWEEK
+  FROM
+    start_date) AS the_day,
+  EXTRACT(HOUR
+  FROM
+    start_date) AS the_hour
+FROM
+  `bigquery-public-data.london_bicycles.cycle_hire` AS hire
+GROUP BY
+  start_station_name,
+  end_station_name,
+  the_day,
+  the_hour
+ORDER BY
+  trips DESC
+LIMIT
+  1000;
+
+--Empty stations by trip types
+SELECT
+  COUNT(rental_id) AS trips,
+  start_station_name,
+  end_station_name,
+  bikes_count,
+  ROUND(AVG(duration)/60,1) AS avg_minutes,
+  CASE
+    WHEN ROUND(AVG(duration)/60,1) >= 30 THEN "workout"
+    WHEN ROUND(AVG(duration)/60,1) >= 7 THEN "commute"
+    WHEN ROUND(AVG(duration)/60,1) <7 THEN "quick ride"
+END
+  AS trip_type/*,
+  EXTRACT(DAYOFWEEK
+  FROM
+    start_date) AS the_day,
+  EXTRACT(HOUR
+  FROM
+    start_date) AS the_hour*/
+FROM
+  `bigquery-public-data.london_bicycles.cycle_hire` AS hire
+JOIN `bigquery-public-data.london_bicycles.cycle_stations` as station
+ON station.id=hire.start_station_id
+WHERE nbEmptyDocks = docks_count
+GROUP BY
+  start_station_name,
+  end_station_name,
+  bikes_count/*,
+  the_day,
+  the_hour */
+ORDER BY
+  trips DESC
+LIMIT
+  1000;
+
+--Empty stations by trip types and peak days, peak hours
+SELECT
+  COUNT(rental_id) AS trips,
+  start_station_name,
+  end_station_name,
+  bikes_count,
+  ROUND(AVG(duration)/60,1) AS avg_minutes,
+  CASE
+    WHEN ROUND(AVG(duration)/60,1) >= 30 THEN "workout"
+    WHEN ROUND(AVG(duration)/60,1) >= 7 THEN "commute"
+    WHEN ROUND(AVG(duration)/60,1) <7 THEN "quick ride"
+END
+  AS trip_type,
+  EXTRACT(DAYOFWEEK
+  FROM
+    start_date) AS the_day,
+  EXTRACT(HOUR
+  FROM
+    start_date) AS the_hour
+FROM
+  `bigquery-public-data.london_bicycles.cycle_hire` AS hire
+JOIN `bigquery-public-data.london_bicycles.cycle_stations` as station
+ON station.id=hire.start_station_id
+WHERE nbEmptyDocks = docks_count
+GROUP BY
+  start_station_name,
+  end_station_name,
+  bikes_count,
+  the_day,
+  the_hour 
+ORDER BY
+  trips DESC
+LIMIT
+  1000;
