@@ -4,13 +4,13 @@ This repo's analysis is based on the London public bike share dataset, accessed 
 
 Customers frequently complain about bike stations being empty. I analyzed real-time rider data to answer the following business questions through SQL and made suggestions about how to improve the service quality of bike sharing systems in London.
 
-Find traces of empty stations.
-How big is this problem?
-What are the most popular stations in the network?
-When does their usage peak?
-What are the most popular trips in the network?
-Are there differences in the types of rides that people take?
-Is there a pattern in the types of stations that are empty?
+- Find traces of empty stations.
+- How big is this problem?
+- What are the most popular stations in the network?
+- When does their usage peak?
+- What are the most popular trips in the network?
+- Are there differences in the types of rides that people take?
+- Is there a pattern in the types of stations that are empty?
 
 # Files in this Repo
 
