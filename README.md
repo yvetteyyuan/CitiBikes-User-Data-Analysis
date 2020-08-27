@@ -16,4 +16,6 @@ Is there a pattern in the types of stations that are empty?
 
 <a href="https://github.com/yvetteyyuan/Santander-Cycles-User-Data-Analysis/blob/master/London%20Bike%20Share%20User%20Analysis.pdf">London Bike Share User Analysis</a>: This document contains data-driven two insights about the complaints of empty bike stations. Finally, an actionable recommendation is given based on these insights.
 
+<a href="https://datastudio.google.com/reporting/82c02261-84ec-4536-b41e-bbb001269343">London Bike Share Data Dashboard</a>: This dashboard contains visualization of key findings from the user data analysis, including fill rate per station, popular trips, popular stations and usage patterns. 
+
 <a href="">Queries for the Analysis</a>: This file contains all the queries where the insights and recommendations are based on.
